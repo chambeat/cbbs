@@ -1,0 +1,245 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" sec:authorize="hasRole('user')" th:replace="main/public :: #public_left(activeUri='list')">
+    </div>
+    <div class="left" sec:authorize="hasRole('admin')"
+         th:replace="main/public :: #public_left(activeUri='allBookings')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span sec:authorize="hasRole('user')">已提交的订单</span>
+            <span sec:authorize="hasRole('admin')">所有订单</span>
+        </div>
+
+        <!-- 查看所有订单(包括'待审核'/'审核通过'/'审核不通过') -->
+        <div class="navbar" sec:authorize="hasRole('admin')">
+            <span>分类查看：</span>&nbsp;
+            <a th:href="@{/bookings}">所有订单</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+            <a th:href="@{/defaultBookings}">待审核的订单</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+            <a th:href="@{/successBookings}">审核通过的订单</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+            <a th:href="@{/failBookings}">审核不通过的订单</a>
+
+            <table>
+                <!-- 搜索框：按"学号或工号"查找 -->
+                <td style="padding-right: 30px">
+                    <form id="searchByCampusId" th:action="@{/bookings}" th:method="get">
+                        <div>
+                            <label>按学号或工号查找：</label>
+                            <input class="txtSearch" id="campusId" type="text" name="campusId" th:value="${campusId}"
+                                   onfocus="$('#campusId').select()" placeholder="请输入学号或工号">
+                            <input class="btnSearch" type="button" onclick="$('#searchByCampusId').submit()" value="查询"/>
+                        </div>
+                    </form>
+                </td>
+                <!-- 搜索框：用来查询某一天的场地预约情况(已通过的) -->
+                <td>
+                    <form id="searchByDate" th:action="@{/bookings}" th:method="get">
+                        <div>
+                            <label>按申请使用的时间查找：</label>
+                            <input class="txtSearch" id="useTime" type="text" name="useTime" th:value="${useTime}" onfocus="$('#useTime').select()" placeholder="格式：xxxx年xx月xx日">
+                            <input class="btnSearch" type="button" onclick="$('#searchByDate').submit()" value="查询"/>
+                        </div>
+                    </form>
+                </td>
+            </table>
+        </div>
+
+        <!-- ============================================ user权限 ==================================================== -->
+        <!-- 1.列表为空 -->
+        <div sec:authorize="hasRole('user')" th:if="${#lists.isEmpty(booking.list)}" align="center"><br/>
+            <h2>空空如也~~您暂时还没有订单哦！</h2><br/>
+            <img th:src="@{/img/emptyList.png}">
+        </div>
+
+        <!-- 2.列表不为空 -->
+        <div sec:authorize="hasRole('user')" th:if="not ${#lists.isEmpty(booking.list)}">
+            <table class="providerTable" cellpadding="0" cellspacing="0">
+                <tr class="firstTr">
+                    <th width="10%">订单编号</th>
+                    <th width="20%">二级学院/部门</th>
+                    <th width="10%">申请人姓名</th>
+                    <th width="10%">学号/工号</th>
+                    <th width="17%">申请使用的时间段</th>
+                    <th width="10%">订单提交时间</th>
+                    <th width="10%">订单状态</th>
+                    <th width="13%">操作</th>
+                </tr>
+
+                <!-- 注意：下面'booking.list'中的'list'是类com.github.pagehelper.PageSerializable<T>中getList()方法的返回值，而不是controller传过来的值。切记！！ -->
+                <tr th:each="b : ${booking.list}">
+                    <td id="mail-bid" th:text="${b.bid}"></td>
+                    <td id="mail-school" th:text="${b.school}"></td>
+                    <td id="mail-applicant" th:text="${b.applicant}"></td>
+                    <td id="mail-campusId" th:text="${b.campusId}"></td>
+                    <td id="mail-useTime" th:text="${b.useTime}"></td>
+                    <td th:text="${#dates.format(b.submitTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td id="mail-status" th:text="${b.status}"></td>
+                    <td>
+                        <!-- 若订单审核通过，则发送"通过凭证"到申请人邮箱 -->
+                        <a id="getEmail"
+                           th:href="@{/sendMail(applicant=${b.applicant}, email=${b.email}, bid=${b.bid}, school=${b.school}, campusId=${b.campusId}, useTime=${b.useTime}, reason=${b.reason}, status=${b.status})}"
+                           th:if="${b.status} == '审核通过'">
+                            <img th:src="@{/img/ticket.png}" alt="获取凭证" title="获取凭证"/>
+                        </a>
+                        <a th:href="@{/booking/}+${b.bid}"><img th:src="@{/img/MORE.png}" alt="订单详情" title="订单详情"/></a>
+                        <a th:attr="del_uri=@{/booking/}+${b.bid}" href="#" class="delete">
+                            <img th:src="@{/img/DELETE.png}" alt="取消订单" title="取消订单"/>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+
+            <!--<br/>-->
+            <!-- 以下是分页条 -->
+            <p sec:authorize="hasRole('user')">
+                共 <span style="font-weight: bold" th:text="${booking.total}"></span> 张订单，当前第
+                <span style="font-weight: bold" th:text="${booking.pageNum}"></span> 页，共
+                <span style="font-weight: bold" th:text="${booking.pages}"></span> 页
+            </p>
+            <!-- 以下用了Bootstrap框架的分页条 -->
+            <div sec:authorize="hasRole('user')" aria-label="Page navigation" th:align="center">
+                <ul class="pagination pagination">
+                    <li>
+                        <a th:href="@{/booking}">
+                            <span aria-hidden="true">首页</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/booking(pageNum = ${booking.hasPreviousPage} ? ${booking.prePage} : 1)}"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&lt;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/booking(pageNum = ${booking.hasNextPage} ? ${booking.nextPage} : ${booking.pages})}"
+                           aria-label="Next">
+                            <span aria-hidden="true">&gt;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/booking(pageNum = ${booking.pages})}">
+                            <span aria-hidden="true">尾页</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+        <!--===========================================================================================================================-->
+        <!--===========================================================================================================================-->
+
+        <!-- ============================================ admin权限 ==================================================== -->
+        <!-- 1.列表为空 -->
+        <div sec:authorize="hasRole('admin')" th:if="${#lists.isEmpty(bookings.list)}" align="center"><br/>
+            <h2>空空如也~~没有查询到相关的记录~</h2><br/>
+            <img th:src="@{/img/emptyList.png}">
+        </div>
+
+        <!-- 2.列表不为空 -->
+        <div sec:authorize="hasRole('admin')" th:if="not ${#lists.isEmpty(bookings.list)}">
+            <table class="providerTable" sec:authorize="hasRole('admin')" cellpadding="0" cellspacing="0">
+                <tr class="firstTr">
+                    <th width="10%">订单编号</th>
+                    <th width="20%">二级学院/部门</th>
+                    <th width="10%">申请人姓名</th>
+                    <th width="10%">学号/工号</th>
+                    <th width="17%">申请使用的时间段</th>
+                    <th width="10%">订单提交时间</th>
+                    <th width="10%">订单状态</th>
+                    <th width="13%">操作</th>
+                </tr>
+                <tr th:each="b : ${bookings.list}">
+                    <td th:text="${b.bid}"></td>
+                    <td th:text="${b.school}"></td>
+                    <td th:text="${b.applicant}"></td>
+                    <td th:text="${b.campusId}"></td>
+                    <td th:text="${b.useTime}"></td>
+                    <td th:text="${#dates.format(b.submitTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${b.status}"></td>
+                    <td>
+                        <a th:href="@{/booking/}+${b.bid}"><img th:src="@{/img/MORE.png}" alt="订单详情" title="订单详情"/></a>
+                        <!--<a sec:authorize="hasRole('admin')" th:href="@{/booking/}+${b.bid}+'?type=update'"><img th:src="@{/img/UPDATE.png}" alt="审核订单" title="审核订单"/></a>-->
+                        <a th:attr="del_uri=@{/bookings/}+${b.bid}" href="#" class="delete">
+                            <img th:src="@{/img/DELETE.png}" alt="取消订单" title="取消订单"/>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+
+            <!--<br/>-->
+            <!-- 以下是分页条 -->
+            <p sec:authorize="hasRole('admin')">
+                共 <span style="font-weight: bold" th:text="${bookings.total}"></span> 张订单，当前第
+                <span style="font-weight: bold" th:text="${bookings.pageNum}"></span> 页，共
+                <span style="font-weight: bold" th:text="${bookings.pages}"></span> 页
+            </p>
+            <div sec:authorize="hasRole('admin')">
+                <!-- 以下用了Bootstrap框架的分页条 -->
+                <div sec:authorize="hasRole('admin')" aria-label="Page navigation" th:align="center">
+                    <ul class="pagination pagination">
+                        <li>
+                            <a th:href="@{/bookings}">
+                                <span aria-hidden="true">首页</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/bookings(pageNum = ${bookings.hasPreviousPage} ? ${bookings.prePage} : 1)}"
+                               aria-label="Previous">
+                                <span aria-hidden="true">&lt;</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/bookings(pageNum = ${bookings.hasNextPage} ? ${bookings.nextPage} : ${bookings.pages})}"
+                               aria-label="Next">
+                                <span aria-hidden="true">&gt;</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/bookings(pageNum = ${bookings.pages})}">
+                                <span aria-hidden="true">尾页</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!--<br/>-->
+    </div>
+</section>
+
+<!--点击删除按钮后弹出的页面-->
+<div class="zhezhao"></div>
+<form method="post" id="deleteForm">
+    <input type="hidden" name="_method" value="delete">
+    <div class="remove" id="removeProv">
+        <div class="removerChid">
+            <h2>提示</h2>
+            <div class="removeMain">
+                <p>您确定要取消该订单吗？</p>
+                <a href="#" id="yes">确定</a>
+                <a href="#" id="no">取消</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<div th:replace="main/public :: #public_js"></div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" th:replace="main/public :: #public_left(activeUri='users')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>所有用户 >> 修改用户信息</span>
+        </div>
+        <div class="providerAdd">
+            <form id="updateUserForm" action="#" th:action="@{/users}" th:method="post">
+                <!--发送PUT请求，修改订单信息：（步骤如下）
+                    1. 在SpringMVC中配置HiddenHttpMethodFilter（SpringBoot自动配置好了）
+                    2. 页面创建一个method="post"表单
+                    3. 创建一个隐藏的input标签 name="_method"，value="指定请求方式"
+                -->
+                <input th:type="hidden" name="_method" value="put">
+
+                <!-- 通过隐藏框传入user.id的值，否则无法顺利执行SQL -->
+                <input type="hidden" name="id" th:value="${user.id}">
+
+                <span style="color: red">* 注意：以下均为重要信息，请谨慎修改！</span>
+                <br/><br/>
+                <div>
+                    <label for="school">所在部门/二级学院：</label>
+                    <input th:value="${user.school}" type="text" name="school" id="school"
+                           placeholder="所在部门/二级学院"/>
+                </div>
+                <div>
+                    <label for="name">姓名：</label>
+                    <input th:value="${user.name}" type="text" name="name" id="name"
+                           placeholder="姓名"/>
+                </div>
+                <div>
+                    <label for="password">密码：</label>
+                    <input th:value="${user.password}" type="text" name="password" id="password"
+                           placeholder="密码"/>
+                </div>
+
+                <!-- 保存和取消的操作 -->
+                <div class="providerAddBtn">
+                    <input type="button" value="保存" onclick="$('#updateUserForm').submit()"/>&nbsp;&nbsp;&nbsp;
+                    <input type="button" value="取消" onclick="history.back(-1)"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<script th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+<script th:src="@{/js/time.js}"></script>
+</body>
+</html>

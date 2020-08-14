@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>教工之家在线预订平台 - 登录</title>
+    <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body class="login_bg">
+<section class="loginBox">
+    <header class="loginHeader">
+        <h1>教工之家在线预订平台</h1>
+    </header>
+    <section class="loginCont">
+        <!-- 当请求路径带有'?error'时，显示"用户名或密码错误" -->
+        <div th:if="${param.error}" style="color:red;" align="center">帐号或密码错误！</div>
+        <form class="loginForm" th:action="@{/index.html}" method="post">
+            <div class="inputbox">
+                <label for="user">帐号</label>
+                <input id="user" type="text" name="username" required/>
+            </div>
+            <div class="inputbox">
+                <label for="pwd">密码</label>
+                <input id="pwd" type="password" name="password" required/>
+            </div>
+            <br/>
+            <div class="subBtn">
+                <input class="loginSubmit" type="submit" value="登录"/>
+                <input type="reset" value="重置"/>
+            </div>
+            <br/>
+        </form>
+    </section>
+</section>
+</body>
+</html>

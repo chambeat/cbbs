@@ -1,0 +1,100 @@
+# 通过指定日志级别，使控制台打印sql
+logging:
+  level:
+    com.chm.mapper: debug
+
+# MyBatis配置
+mybatis:
+  # 核心配置文件路径
+  config-location: classpath:/mybatis/mybatis-config.xml
+  # 映射配置文件路径
+  mapper-locations: classpath:/mybatis/mapper/*.xml
+
+# Spring中的配置
+spring:
+  # 禁用模板缓存，实现热部署
+  thymeleaf:
+    cache: false
+
+  # 指定国际化配置文件的路径
+  messages:
+    basename: i18n.login
+
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cbbs?serverTimezone=GMT%2B8 #此处'%2B'即'+'号（修改时区）
+    username: root
+    password: 123456
+    # 引入Druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 数据源其他配置, DataSourceProperties中没有相关属性，默认无法绑定（需要自定义数据源配置类）
+    initialSize: 8
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    # 配置监控统计拦截的filters，去掉后监控界面sql将无法统计，'wall'用于防火墙
+    filters: stat,wall,logback
+    maxPoolPreparedStatementPerConnectionSize: 25
+    useGlobalDataSourceStat: true
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+  # 开启对PUT和DELETE请求的支持(Spring Boot 2.2.x 之后需要手动开启)
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+  # 配置Spring Data JPA（因为业务需要，在此整合mybatis和jpa）
+  jpa:
+    hibernate:
+      # 根据实体类自动地创建或更新数据表
+      ddl-auto: update
+    # 在控制台打印sql语句
+    # show-sql: true
+    # 默认创建表时所使用的存储引擎是MyISAM，不支持事务，所以无法实现事务回滚。
+    # 指定如下方言：创建的表就用InnoDB作为存储引擎，可以实现事务回滚。
+    database-platform: org.hibernate.dialect.MySQL57Dialect
+
+  # 配置邮箱信息（用于系统邮件发送）
+  mail:
+    # 发件人邮箱
+    username: 1204295973@qq.com
+    # 发件人邮箱授权码
+    password: arnqsizlcdzkidcj
+    # 发送邮件的服务器
+    host: smtp.qq.com
+    # 将阿里云禁用的25端口换成建议使用的465端口，并配置SSL(否则无法发送)
+    port: 465
+    # 其他属性配置(如下)
+    properties:
+      mail:
+        smtp:
+          ssl:
+            # 开启SSL安全连接
+            enable: true
+            socketFactory:
+              class: com.fintech.modules.base.util.mail.MailSSLSocketFactory
+        imap:
+          ssl:
+            socketFactory:
+              fallback: false
+
+
+# 指定访问端口号
+server:
+  port: 8888
+
+# 配置分页插件
+pagehelper:
+  helper-dialect: mysql
+  params: count = countSql
+  reasonable: true
+  support-methods-arguments: true
+

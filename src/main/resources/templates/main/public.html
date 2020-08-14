@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" id="public_head">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- 锁定布局，禁止缩放(注释后，在手机上访问时布局就不会乱了) -->
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+    <!-- (Bootstrap)上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>教工之家在线预订平台</title>
+    <link rel="stylesheet" th:href="@{/css/public.css}"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <!-- Bootstrap -->
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet">
+    <!-- 弹出消息响应 -->
+    <link th:href="@{/css/systemResp.css}" rel="stylesheet">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" id="public_header">
+    <h1 sec:authorize="hasRole('user')">教工之家在线预订平台</h1>
+    <h1 sec:authorize="hasRole('admin')">教工之家在线预订平台 [管理员工作台]</h1>
+
+    <div class="publicHeaderR" sec:authorize="isAuthenticated()">
+        <p><span id="hours"></span><span style="color: #fff21b" sec:authentication="name"> 游客(未指定)</span>&nbsp;&nbsp;</p>
+        <a th:href="@{/logout}" href="../main/login.html">退出</a>
+    </div>
+</header>
+<!--时间-->
+<section class="publicTime" id="public_time">
+    <span id="time"></span>
+    <a href="#">温馨提示：为了能正常浏览，请使用 Google Chrome 作为浏览器！</a>
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" id="public_left">
+        <h2 class="leftH2"><span class="span1"></span>功能列表 <span></span></h2>
+        <nav>
+            <ul class="list" sec:authorize="hasRole('user')">
+                <li th:id="${activeUri == 'home' ? 'active' : ''}"><a th:href="@{/main.html}"><img th:src="@{/img/home.png}" align="center">&emsp;首页</a></li>
+                <li th:id="${activeUri == 'noticeBoard' ? 'active' : ''}"><a th:href="@{/noticeBoard}"><img th:src="@{/img/noticeBoard.png}" align="center">&emsp;公告栏</a></li>
+                <li th:id="${activeUri == 'booking' ? 'active' : ''}"><a th:href="@{/toBooking}"><img th:src="@{/img/room.png}" align="center">&emsp;在线预订</a></li>
+                <li th:id="${activeUri == 'list' ? 'active' : ''}"><a th:href="@{/booking}"><img th:src="@{/img/bill.png}" align="center">&emsp;我的订单</a></li>
+                <li th:id="${activeUri == 'pwd' ? 'active' : ''}"><a th:href="@{/user/pwd}"><img th:src="@{/img/pwd.png}" align="center">&emsp;密码修改</a></li>
+                <li th:id="${activeUri == 'FAQ' ? 'active' : ''}"><a th:href="@{/FAQ}"><img th:src="@{/img/advice.png}" align="center">&emsp;常见问题</a></li>
+            </ul>
+            <ul class="listAdmin" sec:authorize="hasRole('admin')">
+                <li th:id="${activeUri == 'home' ? 'active' : ''}"><a th:href="@{/main.html}"><img th:src="@{/img/homeAdmin.png}" align="center">&emsp;首页</a></li>
+                <li th:id="${activeUri == 'allBookings' ? 'active' : ''}"><a th:href="@{/defaultBookings}"><img th:src="@{/img/bill.png}" align="center">&emsp;订单管理</a></li>
+                <li th:id="${activeUri == 'users' ? 'active' : ''}"><a th:href="@{/users}"><img th:src="@{/img/user.png}" align="center">&emsp;用户管理</a></li>
+                <li th:id="${activeUri == 'feedbacks' ? 'active' : ''}"><a th:href="@{/feedbacks}"><img th:src="@{/img/msgBox.png}" align="center">&emsp;反馈信箱</a></li>
+                <li th:id="${activeUri == 'noticeBoard' ? 'active' : ''}"><a th:href="@{/noticeBoard}"><img th:src="@{/img/notice.png}" align="center">&emsp;公告管理</a></li>
+                <li th:id="${activeUri == 'pwd' ? 'active' : ''}"><a th:href="@{/user/pwd}"><img th:src="@{/img/pwd.png}" align="center">&emsp;密码修改</a></li>
+            </ul>
+        </nav>
+    </div>
+</section>
+
+<!--点击删除按钮后弹出的页面-->
+<div class="zhezhao"></div>
+<form method="post" id="deleteForm">
+    <input type="hidden" name="_method" value="delete">
+    <div class="remove" id="removeProv">
+        <div class="removerChid">
+            <h2>提示</h2>
+            <div class="removeMain">
+                <p>你确定要删除吗？</p>
+                <a href="#" id="yes">确定</a>
+                <a href="#" id="no">取消</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<footer class="footer" id="public_footer">
+    <div style="text-align:center;">
+        <p><a class="footer" href="http://www.beian.miit.gov.cn/" target="_blank">粤ICP备20025812号</a>&nbsp;&nbsp;</p>
+    </div>
+</footer>
+
+<!-- 项目中需要多处引入的公共js文件 -->
+<div id="public_js">
+    <script th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+    <script th:src="@{/js/js.js}"></script>
+    <!-- 显示当前日期和时间 -->
+    <script th:src="@{/js/time.js}"></script>
+</div>
+
+</body>
+</html>

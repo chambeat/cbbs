@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+
+<body>
+<!--主体内容-->
+<div>
+    <h3>尊敬的<span th:text="${applicant}"></span>：</h3>
+    <p>您好！您的订单<span style="color: #45880c">已通过审核</span>。使用当天向工作人员出示本邮件和有效证件（教工证或学生证），即可进行使用。</p>
+    <p>
+        订单编号：<u><span th:text="${bid}"></span><br/></u>
+        部门：<u><span th:text="${school}"></span></u><br/>
+        姓名：<u><span th:text="${applicant}"></span></u><br/>
+        学号/工号：<u><span th:text="${campusId}"></span></u><br/>
+        使用时段：<u><span th:text="${useTime}"></span></u><br/>
+        申请原因：<u><span th:text="${reason}"></span></u><br/>
+        订单状态：<u><span th:text="${status}"></span></u>
+    </p>
+
+</div>
+
+
+</body>
+</html>

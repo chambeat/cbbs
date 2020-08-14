@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chm.mapper.BookingMapper">
+    <!-- user查询"我的订单" -->
+    <select id="getBookings" resultType="com.chm.entity.Booking">
+        select * from booking
+        where campusId = #{campusId}
+        order by `submitTime` desc
+    </select>
+
+    <!-- admin查询所有用户提交的订单 -->
+    <select id="allBookings" resultType="com.chm.entity.Booking">
+        select * from booking
+        <where>
+            <if test="campusId != null and campusId != ''">
+                `campusId` = #{campusId}
+            </if>
+            <if test="useTime != null and useTime != ''">
+                `useTime` like CONCAT("%", #{useTime}, "%")
+            </if>
+        </where>
+    </select>
+
+    <!-- admin查询'待审核'订单 -->
+    <select id="defaultBookings" resultType="com.chm.entity.Booking">
+        select * from booking
+        where status = '待审核'
+        <if test="campusId != null and campusId != ''">
+            and `campusId` = #{campusId}
+        </if>
+        <if test="useTime != null and useTime != ''">
+            and `useTime` like CONCAT("%", #{useTime}, "%")
+        </if>
+        order by `useTime`, `submitTime`
+    </select>
+
+    <!-- admin查询'审核通过'的订单 -->
+    <!-- 注意(可能的坑)：若要使用MyBatis的pageHelper插件，同时还要使用MyBatis的动态SQL，则只能使用"预编译方式"，即指定statementType="PREPARED"。（很多人说否则报错，但我一切正常(存疑)？？） -->
+    <select id="successBookings" resultType="com.chm.entity.Booking">
+        select * from booking
+        where status = '审核通过'
+        <if test="useTime != null and useTime != ''">
+            and `useTime` like CONCAT("%", #{useTime}, "%")
+        </if>
+        <if test="campusId != null and campusId != ''">
+            and `campusId` = #{campusId}
+        </if>
+        order by `useTime`
+    </select>
+
+    <!-- admin查询'审核不通过'的订单 -->
+    <select id="failBookings" resultType="com.chm.entity.Booking">
+        select * from booking
+        where status like CONCAT("%", '审核不通过', "%")
+        <if test="useTime != null and useTime != ''">
+            and `useTime` like CONCAT("%", #{useTime}, "%")
+        </if>
+        <if test="campusId != null and campusId != ''">
+            and `campusId` = #{campusId}
+        </if>
+    </select>
+
+    <select id="getBookingByBid" resultType="com.chm.entity.Booking">
+        select * from booking where bid = #{bid}
+    </select>
+
+    <!-- 提交订单 -->
+    <insert id="saveBooking">
+        INSERT INTO `booking` (`school`, `applicant`, `campusId`, `phone`, `email`, `useTime`, `reason`)
+        VALUES (#{school}, #{applicant}, #{campusId}, #{phone}, #{email}, #{useTime}, #{reason})
+    </insert>
+
+    <delete id="deleteBookingByBid">
+        delete from booking where bid = #{bid}
+    </delete>
+
+    <!-- admin修改订单状态 -->
+    <update id="updateBooking">
+        UPDATE `booking`
+        SET `status`=#{status}
+        WHERE `bid` = #{bid}
+    </update>
+
+    <!-- AJAX请求：查询所有被预约的时间(仅限'待审核'和'审核通过'的订单)，判断时间是否冲突 -->
+    <select id="isBookedTime" resultType="java.lang.String">
+        select `useTime` from `booking`
+        where `status` != '审核不通过'
+        and `useTime` = #{useTime}
+    </select>
+</mapper>

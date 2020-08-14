@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chm.mapper.NoticeMapper">
+    <!-- 查询所有公告(按照距当前时间从近到远排列) -->
+    <select id="getNotices" resultType="com.chm.entity.Notice">
+        select * from `notice`
+        order by `publishTime` desc
+    </select>
+
+    <!-- 查询某一条公告(根据id查询公告) -->
+    <select id="getNoticeById" resultType="com.chm.entity.Notice">
+        select * from `notice`
+        where id = #{id}
+    </select>
+
+    <!-- admin权限：发布公告 -->
+    <insert id="saveNotice">
+        INSERT INTO `notice` (`title`, `content`)
+        VALUES (#{title}, #{content})
+    </insert>
+
+    <!-- admin权限：删除公告 -->
+    <delete id="deleteNotice">
+        delete from `notice` where id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" th:replace="main/public :: #public_left(activeUri='users')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>所有用户 >> 添加用户</span>
+        </div>
+        <div class="providerAdd">
+            <form id="addForm" th:action="@{/users}" th:method="post">
+                <!--div的class 为error是验证错误，ok是验证成功-->
+                <span>注意：带*为必填项。</span>
+                <div class="">
+                    <label for="school">部门/二级学院：</label>
+                    <input type="text" name="school" id="school" placeholder="请输入所在部门或二级学院名称" autofocus required/>
+                </div>
+                <div>
+                    <label for="name">姓名：</label>
+                    <input type="text" name="name" id="name" onfocus="$('#name').select()" placeholder="请输入姓名" required/>
+
+                </div>
+                <div>
+                    <label for="username">学号/工号：</label>
+                    <input type="text" name="username" id="username" onfocus="$('#username').select()" placeholder="请输入学号或工号" required/>
+                    <span>* 此项将作为系统帐号</span>
+                </div>
+                <div>
+                    <label for="password">密码：</label>
+                    <input type="text" name="password" id="password" onfocus="$('#password').select()" placeholder="请输入密码" required/>
+                    <span>* 初始密码默认为学号/工号</span>
+                </div>
+
+                <!-- 保存或取消 -->
+                <div class="providerAddBtn">
+                    <input class="addBooking" type="submit" value="保存"/>
+                    <a th:href="@{/users}">取消</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<script src="../js/jquery.js"></script>
+<script src="js/time.js"></script>
+</body>
+</html>

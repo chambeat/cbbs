@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" th:replace="main/public :: #public_left(activeUri='allBookings')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>所有订单 >> 订单审核</span>
+        </div>
+        <div class="providerAdd">
+            <form id="updateForm" action="#" th:action="@{/booking}+'?page=defaultBookings'" th:method="post">
+                <!--发送PUT请求，修改订单信息：（步骤如下）
+                    1. 在SpringMVC中配置HiddenHttpMethodFilter（SpringBoot自动配置好了）
+                    2. 页面创建一个method="post"表单
+                    3. 创建一个隐藏的input标签 name="_method"，value="指定请求方式"
+                -->
+                <input th:type="hidden" name="_method" value="put">
+
+                <!-- 通过隐藏框传入booking.bid的值，否则无法顺利执行SQL -->
+                <input type="hidden" name="bid" th:value="${booking.bid}">
+
+                <!--div的class 为error是验证错误，ok是验证成功-->
+                <div class="">
+                    <label for="school">二级学院/部门：</label>
+                    <input th:value="${booking.school}" type="text" name="school" id="school"
+                           placeholder="二级学院/部门" disabled/>
+                </div>
+                <div>
+                    <label for="applicant">申请人姓名：</label>
+                    <input th:value="${booking.applicant}" type="text" name="applicant" id="applicant"
+                           placeholder="申请人姓名" disabled/>
+                </div>
+                <div>
+                    <label for="phone">手机号码：</label>
+                    <input th:value="${booking.phone}" type="text" name="phone" id="phone"
+                           placeholder="手机号码" disabled/>
+                </div>
+                <div>
+                    <label for="useTime">申请使用的时间段：</label>
+                    <input th:value="${booking.useTime}" type="text" name="useTime" id="useTime"
+                           placeholder="申请使用的时间段" disabled/>
+                </div>
+                <div>
+                    <label for="reason">申请原因：</label>
+                    <input th:value="${booking.reason}" type="text" name="reason" id="reason"
+                           placeholder="申请原因" disabled/>
+                </div>
+                <div>
+                    <strong><label style="font-size: small">是否审核通过该订单：</label></strong>
+                    <select name="status" >
+                        <!-- '请选择'默认为当前的订单状态 -->
+                        <option th:value="${booking.status}">-------------- 请选择 --------------</option>
+                        <option value="审核通过">审核通过</option>
+                        <option value="审核不通过">审核不通过</option>
+                    </select>
+                    <span>* 请进行操作</span>
+                </div>
+
+                <!-- 保存和取消的操作 -->
+                <div class="providerAddBtn">
+                    <input type="button" value="保存" onclick="$('#updateForm').submit()"/>&nbsp;&nbsp;&nbsp;
+                    <input type="button" value="取消" onclick="history.back(-1)"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<div th:replace="main/public :: #public_js"></div>
+</body>
+</html>

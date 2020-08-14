@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" th:replace="main/public :: #public_left(activeUri='noticeBoard')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>公告发布</span>
+        </div>
+        <div class="providerAdd">
+            <form id="addForm" th:action="@{/notice}" th:method="post">
+                <div>
+                    <label for="noticeTitle">标题：</label>
+                    <input id="noticeTitle" name="title" type="text" maxlength="30" placeholder="请在此输入标题（30字内）"
+                           autofocus required onkeydown="if(event.keyCode==32 || event.keyCode==13){return false;}">
+                </div>
+                <div>
+                    <table>
+                        <td><label for="noticeContent">正文：</label></td>
+                        <!-- 文本域 -->
+                        <td><textarea id="noticeContent" name="content" rows="20" cols="80" maxlength="600"
+                                      placeholder="请在此输入正文内容（500字内）" autofocus required
+                                      onkeydown="if(event.keyCode==32 || event.keyCode==13){return false;}"></textarea>
+                        </td>
+                    </table>
+                </div>
+                <div class="providerAddBtn">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <input class="addBooking" type="submit" value="确认发布"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <!--<input type="button" value="取消" onclick="history.back(-1)"/>-->
+                    <a th:href="@{/noticeBoard}">取消</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</section>
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<script src="js/time.js"></script>
+</body>
+</html>

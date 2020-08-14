@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" th:replace="main/public :: #public_left(activeUri='home')">
+    </div>
+    <div class="right">
+        <img class="wImg" th:src="@{/img/welcome.png}" alt=""/>
+        <div class="wFont">
+            <span sec:authorize="isAuthenticated()">
+                <div id="hours"></div>
+                <h2 sec:authentication="name">游客(未指定)</h2>
+            </span>
+            <p sec:authorize="hasRole('user')">欢迎使用教工之家在线预订平台！</p>
+            <p sec:authorize="hasRole('admin')">欢迎使用教工之家在线预订平台（管理员工作台）！</p>
+        </div>
+    </div>
+</section>
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+<script src="js/time.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" sec:authorize="hasAnyRole('admin','user')" th:replace="main/public :: #public_left(activeUri='noticeBoard')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>公告栏</span>
+        </div>
+
+        <!--反馈信息操作表格-->
+        <table class="providerTable" cellpadding="0" cellspacing="0">
+            <div class="newNotice" sec:authorize="hasRole('admin')">
+                <a th:href="@{/toNotice}">发布新公告</a>
+            </div>
+
+            <tr th:each="n : ${notices.list}">
+                <td><a id="titleOfNotice" th:href="@{/noticeBoard/}+${n.id}" th:text="${n.title}"></a></td>
+                <td th:text="${#dates.format(n.publishTime, 'yyyy-MM-dd')}"></td>
+                <td sec:authorize="hasRole('admin')">
+                    <a th:attr="del_uri=@{/notice/}+${n.id}" href="#" class="delete" ><img th:src="@{/img/DELETE.png}" alt="删除" title="删除"/></a>
+                </td>
+                <!--下面的td只是为了界面好看(行高统一)而加的-->
+                <td sec:authorize="hasRole('user')">
+                    <a><img th:src="@{/img/unseen.png}"/></a>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 以下是分页条 -->
+        <p>
+            共 <span style="font-weight: bold" th:text="${notices.total}"></span> 条，当前第 <span style="font-weight: bold" th:text="${notices.pageNum}"></span> 页，共 <span style="font-weight: bold" th:text="${notices.pages}"></span> 页
+        </p>
+        <!-- 以下用了Bootstrap框架的分页条 -->
+        <div aria-label="Page navigation" th:align="center">
+            <ul class="pagination pagination">
+                <li>
+                    <a th:href="@{/noticeBoard}">
+                        <span aria-hidden="true">首页</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/noticeBoard(pageNum = ${notices.hasPreviousPage} ? ${notices.prePage} : 1)}" aria-label="Previous">
+                        <span aria-hidden="true">&lt;</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/noticeBoard(pageNum = ${notices.hasNextPage} ? ${notices.nextPage} : ${notices.pages})}" aria-label="Next">
+                        <span aria-hidden="true">&gt;</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/noticeBoard(pageNum = ${notices.pages})}">
+                        <span aria-hidden="true">尾页</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!--点击删除按钮后弹出的页面-->
+<div class="zhezhao"></div>
+<form method="post" id="deleteForm">
+    <!--与PUT请求类似，DELETE请求也需要显式地指定请求方式-->
+    <input type="hidden" name="_method" value="delete">
+    <div class="remove" id="removeProv">
+       <div class="removerChid">
+           <h2>提示</h2>
+           <div class="removeMain" >
+               <p>确定删除该公告吗？</p>
+               <a href="#" id="yes">确定</a>
+               <a href="#" id="no">取消</a>
+           </div>
+       </div>
+    </div>
+</form>
+
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<div th:replace="main/public :: #public_js"></div>
+</body>
+</html>

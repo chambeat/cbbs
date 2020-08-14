@@ -1,0 +1,44 @@
+/* div模板元素的样式 */
+.respMsg {
+    font-size: medium;
+    display: none;
+    position: fixed;
+    top: 8%;
+    left: 50%;
+    min-width: 300px;
+    max-width: 600px;
+    transform: translate(-50%, -50%);
+    z-index: 99999;
+    text-align: center;
+    padding: 15px;
+    border-radius: 3px;
+}
+
+/* 操作成功 */
+.respMsg-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+/* 提示 */
+.respMsg-info {
+    color: #31708f;
+    background-color: #d9edf7;
+    border-color: #bce8f1;
+}
+
+/* 警告 */
+.respMsg-warning {
+    color: #8a6d3b;
+    background-color: #fcf8e3;
+    border-color: #faebcc;
+}
+
+/* 操作失败 */
+.respMsg-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+

@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" th:replace="main/public :: #public_left(activeUri='allBookings')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>不通过的订单</span>
+        </div>
+
+        <!-- 查看所有订单(包括'待审核'/'审核通过'/'审核不通过') -->
+        <div class="navbar" sec:authorize="hasRole('admin')">
+            <span>分类查看：</span>&nbsp;
+            <a th:href="@{/bookings}">所有订单</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+            <a th:href="@{/defaultBookings}">待审核的订单</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+            <a th:href="@{/successBookings}">审核通过的订单</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+            <a th:href="@{/failBookings}">审核不通过的订单</a>
+
+            <table>
+                <!-- 搜索框：按"学号或工号"查找 -->
+                <td style="padding-right: 30px">
+                    <form id="searchByCampusId" th:action="@{/failBookings}" th:method="get">
+                        <div>
+                            <label>按学号或工号查找：</label>
+                            <input class="txtSearch" id="campusId" type="text" name="campusId" th:value="${campusId}"
+                                   onfocus="$('#campusId').select()" placeholder="请输入学号或工号">
+                            <input class="btnSearch" type="button" onclick="$('#searchByCampusId').submit()" value="查询"/>
+                        </div>
+                    </form>
+                </td>
+                <!-- 搜索框：用来查询某一天的场地预约情况(已通过的) -->
+                <td>
+                    <form id="searchByDate" th:action="@{/failBookings}" th:method="get">
+                        <div>
+                            <label>按申请使用的时间查找：</label>
+                            <input class="txtSearch" id="useTime" type="text" name="useTime" th:value="${useTime}" onfocus="$('#useTime').select()" placeholder="格式：xxxx年xx月xx日">
+                            <input class="btnSearch" type="button" onclick="$('#searchByDate').submit()" value="查询"/>
+                        </div>
+                    </form>
+                </td>
+            </table>
+        </div>
+
+        <!--===========================================================================================================================-->
+        <!-- ============================================ 3.审核不通过的订单 ==================================================== -->
+        <!-- 1.列表为空 -->
+        <div sec:authorize="hasRole('admin')" th:if="${#lists.isEmpty(bookings.list)}" align="center"><br/>
+            <h2>空空如也~~没有查询到相关的记录~</h2><br/>
+            <img th:src="@{/img/emptyList.png}">
+        </div>
+
+        <!-- 2.列表不为空 -->
+        <div th:if="not ${#lists.isEmpty(bookings.list)}">
+            <table class="providerTable" cellpadding="0" cellspacing="0">
+                <tr class="firstTr">
+                    <th width="10%">订单编号</th>
+                    <th width="20%">二级学院/部门</th>
+                    <th width="10%">申请人姓名</th>
+                    <th width="10%">学号/工号</th>
+                    <th width="17%">申请使用的时间段</th>
+                    <th width="10%">订单提交时间</th>
+                    <th width="10%">订单状态</th>
+                    <th width="13%">操作</th>
+                </tr>
+                <tr th:each="b : ${bookings.list}">
+                    <td th:text="${b.bid}"></td>
+                    <td th:text="${b.school}"></td>
+                    <td th:text="${b.applicant}"></td>
+                    <td th:text="${b.campusId}"></td>
+                    <td th:text="${b.useTime}"></td>
+                    <td th:text="${#dates.format(b.submitTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${b.status}"></td>
+                    <td>
+                        <a th:href="@{/booking/}+${b.bid}"><img th:src="@{/img/MORE.png}" alt="订单详情" title="订单详情"/></a>
+                        <!--<a sec:authorize="hasRole('admin')" th:href="@{/booking/}+${b.bid}+'?type=update'"><img th:src="@{/img/UPDATE.png}" alt="审核订单" title="审核订单"/></a>-->
+                        <!--<a th:attr="del_uri=@{/bookings/}+${b.bid}" href="#" class="delete" ><img th:src="@{/img/DELETE.png}" alt="取消订单" title="取消订单"/></a>-->
+                    </td>
+                </tr>
+            </table>
+
+            <!-- 以下是分页条 -->
+            <p>
+                共 <span style="font-weight: bold" th:text="${bookings.total}"></span> 张订单，当前第 <span style="font-weight: bold" th:text="${bookings.pageNum}"></span> 页，共 <span style="font-weight: bold" th:text="${bookings.pages}"></span> 页
+            </p>
+            <div>
+                <!-- 以下用了Bootstrap框架的分页条 -->
+                <div sec:authorize="hasRole('admin')" aria-label="Page navigation" th:align="center">
+                    <ul class="pagination pagination">
+                        <li>
+                            <a th:href="@{/failBookings}">
+                                <span aria-hidden="true">首页</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/failBookings(pageNum = ${bookings.hasPreviousPage} ? ${bookings.prePage} : 1)}" aria-label="Previous">
+                                <span aria-hidden="true">&lt;</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/failBookings(pageNum = ${bookings.hasNextPage} ? ${bookings.nextPage} : ${bookings.pages})}" aria-label="Next">
+                                <span aria-hidden="true">&gt;</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/failBookings(pageNum = ${bookings.pages})}">
+                                <span aria-hidden="true">尾页</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!--<br/>-->
+
+        <!--<br/>-->
+    </div>
+</section>
+
+<!--点击删除按钮后弹出的页面-->
+<div class="zhezhao"></div>
+<form method="post" id="deleteForm">
+    <input type="hidden" name="_method" value="delete">
+    <div class="remove" id="removeProv">
+       <div class="removerChid">
+           <h2>提示</h2>
+           <div class="removeMain" >
+               <p>您确定要取消该订单吗？</p>
+               <a href="#" id="yes">确定</a>
+               <a href="#" id="no">取消</a>
+           </div>
+       </div>
+    </div>
+</form>
+
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<div th:replace="main/public :: #public_js"></div>
+</body>
+</html>

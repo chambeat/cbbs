@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!-- 响应提示框：显示几秒后，自动消失 -->
+<div class="respMsg"></div>
+
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" sec:authorize="hasRole('admin')" th:replace="main/public :: #public_left(activeUri='users')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>所有用户</span>
+        </div>
+
+        <!--<br/>-->
+        <div class="search">
+            <table>
+                <!-- 查询用户 -->
+                <td>
+                    <form id="searchUserForm" th:action="@{/users}" th:method="get">
+                        <span>查找用户：</span>
+                        <input type="text" id="username" name="username" th:value="${username}" placeholder="请输入学号或工号"
+                               onfocus="$('#username').select()"/>
+                        <input type="button" onclick="$('#searchUserForm').submit()" value="查询"/>
+                    </form>
+                </td>
+                <!-- 添加用户 -->
+                <td>
+                <td style="padding-left: 200px">
+                    <a th:href="@{/user}" th:method="get">添加用户</a>
+                </td>
+                <!-- 上传文件，批量导入用户 -->
+                <td>
+                    <a href="#" class="batch">从文件添加</a>
+                </td>
+            </table>
+        </div>
+
+        <!-- 1.列表为空 -->
+        <div th:if="${#lists.isEmpty(users.list)}" align="center"><br/><br/>
+            <h2>空空如也~没有查询到相关的记录~</h2><br/>
+            <img th:src="@{/img/emptyList.png}">
+        </div>
+        <!-- 2.列表不为空 -->
+        <div th:if="not ${#lists.isEmpty(users.list)}">
+            <!--用户信息操作表格-->
+            <table class="providerTable" cellpadding="0" cellspacing="0">
+                <tr class="firstTr">
+                    <th width="10%">用户编号</th>
+                    <th width="20%">所在部门/二级学院</th>
+                    <th width="10%">用户姓名</th>
+                    <th width="15%">帐号/学号</th>
+                    <th width="15%">用户角色(权限)</th>
+                    <th width="15%">操作</th>
+                </tr>
+                <tr th:each="u : ${users.list}">
+                    <td th:text="${u.id}"></td>
+                    <td th:text="${u.school}"></td>
+                    <td th:text="${u.name}"></td>
+                    <td th:text="${u.username}"></td>
+                    <td th:text="${u.roles.get(0).nameZh}"></td>
+                    <td>
+                        <a th:href="@{/users/}+${u.id}"><img th:src="@{/img/MORE.png}" alt="用户详情" title="用户详情"/></a>
+                        <a th:href="@{/users/}+${u.id}+'?type=updateUser'">
+                            <img th:src="@{/img/UPDATE.png}" alt="修改" title="修改"/>
+                        </a>
+                        <a th:attr="del_uri=@{/users/}+${u.id}" href="#" class="delete">
+                            <img th:src="@{/img/DELETE.png}" alt="删除用户" title="删除用户"/>
+                        </a>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- 以下是分页条 -->
+            <p>
+                共 <span style="font-weight: bold" th:text="${users.total}"></span> 位用户，当前第
+                <span style="font-weight: bold" th:text="${users.pageNum}"></span> 页，共
+                <span style="font-weight: bold" th:text="${users.pages}"></span> 页
+            </p>
+            <!-- 以下用了Bootstrap框架的分页条 -->
+            <div sec:authorize="hasRole('admin')" aria-label="Page navigation" th:align="center">
+                <ul class="pagination pagination">
+                    <li>
+                        <a th:href="@{/users}">
+                            <span aria-hidden="true">首页</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/users(pageNum = ${users.hasPreviousPage} ? ${users.prePage} : 1)}"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&lt;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/users(pageNum = ${users.hasNextPage} ? ${users.nextPage} : ${users.pages})}"
+                           aria-label="Next">
+                            <span aria-hidden="true">&gt;</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/users(pageNum = ${users.pages})}">
+                            <span aria-hidden="true">尾页</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--点击删除按钮后弹出的页面-->
+<div class="zhezhao"></div>
+<form method="post" id="deleteForm">
+    <!--与PUT请求类似，DELETE请求也需要显式地指定请求方式-->
+    <input type="hidden" name="_method" value="delete">
+    <div class="remove" id="removeProv">
+        <div class="removerChid">
+            <h2>提示</h2>
+            <div class="removeMain">
+                <p>确定删除该用户吗？</p>
+                <a href="#" id="yes">确定</a>&emsp;
+                <a href="#" id="no">取消</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- 批量添加用户 -->
+<form id="batchForm" enctype="multipart/form-data" th:action="@{/upload}" method="post">
+    <div class="remove" id="batchProv">
+        <div class="removerChid">
+            <h2>从 Excel 导入</h2>
+            <div class="removeMain">
+                <span>
+                    <input id="fileId" type="file" name="file"/>
+                </span>
+                <br/>
+                <a href="#" id="upload">上传</a>&emsp;&emsp;
+                <a href="#" id="cancel">取消</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<div th:replace="main/public :: #public_js"></div>
+<!-- 引入通过文件批量添加用户的js -->
+<script th:src="@{/js/batch.js}"></script>
+</body>
+</html>

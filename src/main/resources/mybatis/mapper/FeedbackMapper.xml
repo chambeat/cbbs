@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chm.mapper.FeedbackMapper">
+    <!-- 查询所有问题反馈 -->
+    <select id="getFeedbacks" resultType="com.chm.entity.Feedback">
+        select * from `feedback`
+        order by `time` desc
+    </select>
+
+    <!-- 提交问题反馈 -->
+    <insert id="saveFeedback">
+        INSERT INTO `feedback` (`question`)
+        VALUES (#{question})
+    </insert>
+
+    <!-- 删除反馈信息 -->
+    <delete id="deleteFeedback">
+        delete from `feedback` where id = #{id}
+    </delete>
+</mapper>

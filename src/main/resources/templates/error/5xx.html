@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>系统繁忙中</title>
+</head>
+<body>
+<!-- ========== 以下代码用于debug，可以通过浏览器控制台或网页源代码查看(找到)错误或异常的信息（无意中发现的，即使被注释掉也会生效，还挺好用！！！！！！） ========== -->
+<!--5xx错误-->
+<!--<p>[[${timestamp}]]</p>-->
+<!--<p>[[${status}]]</p>-->
+<!--<p>[[${error}]]</p>-->
+<!--<p>[[${exception}]]</p>-->
+<!--<p>[[${message}]]</p>-->
+<!--<p>[[${msg}]]</p>-->
+<!-- ========== 以上代码用于debug，可以通过浏览器控制台或网页源代码查看(找到)错误或异常的信息（无意中发现的，即使被注释掉也会生效，还挺好用！！！！！！） ========== -->
+
+    <div align="center">
+        <br><br><br><br>
+        <p style="font-size: x-large"><img th:src="@{/img/error.png}" align="center">&nbsp;很抱歉，系统繁忙中，请稍后再试...</p>
+
+        <a style="text-decoration: none; color: #2384b6" th:href="@{/main.html}">返回系统首页</a>
+    </div>
+
+</body>
+</html>

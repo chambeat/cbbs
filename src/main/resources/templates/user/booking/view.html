@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" sec:authorize="hasRole('user')" th:replace="main/public :: #public_left(activeUri='list')">
+    </div>
+    <div class="left" sec:authorize="hasRole('admin')" th:replace="main/public :: #public_left(activeUri='allBookings')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span sec:authorize="hasRole('user')">已提交的订单 >> 订单详情</span>
+            <span sec:authorize="hasRole('admin')">所有订单 >> 订单详情</span>
+        </div>
+        <div class="providerView">
+            <p><strong>订单编号：</strong><span th:text="${booking.bid}">订单编号</span></p>
+            <p><strong>二级学院/部门：</strong><span th:text="${booking.school}">二级学院/部门</span></p>
+            <p><strong>申请人姓名：</strong><span th:text="${booking.applicant}">申请人姓名</span></p>
+            <p><strong>手机号码：</strong><span th:text="${booking.phone}">手机号码</span></p>
+            <p><strong>邮箱：</strong><span th:text="${booking.email}">邮箱</span></p>
+            <p><strong>申请使用的时间段：</strong><span th:text="${booking.useTime}">申请使用的时间段</span></p>
+            <p><strong>申请原因：</strong><span th:text="${booking.reason}">申请原因</span></p>
+
+            <!-- "查看详情"页面的返回按钮(直接后退回上一步) -->
+            <a onclick="history.back(-1)">返回</a>
+        </div>
+    </div>
+</section>
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<script th:src="@{/js/time.js}"></script>
+</body>
+</html>

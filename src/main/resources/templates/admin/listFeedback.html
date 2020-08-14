@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" sec:authorize="hasRole('admin')" th:replace="main/public :: #public_left(activeUri='feedbacks')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>反馈信箱</span>
+        </div>
+
+        <!--反馈信息操作表格-->
+        <table class="providerTable" cellpadding="0" cellspacing="0">
+            <tr class="firstTr">
+                <th width="84%">反馈内容</th>
+                <th width="10%">提交时间</th>
+                <th width="6%">操作</th>
+            </tr>
+            <tr th:each="f : ${feedbacks.list}">
+                <td th:text="${f.question}"></td>
+                <td th:text="${#dates.format(f.time, 'yyyy-MM-dd')}"></td>
+                <td>
+                    <a th:attr="del_uri=@{/feedbacks/}+${f.id}" href="#" class="delete" ><img th:src="@{/img/DELETE.png}" alt="删除" title="删除"/></a>
+                </td>
+            </tr>
+        </table>
+
+        <!-- 以下是分页条 -->
+        <p>
+            共 <span style="font-weight: bold" th:text="${feedbacks.total}"></span> 条反馈信息，当前第 <span style="font-weight: bold" th:text="${feedbacks.pageNum}"></span> 页，共 <span style="font-weight: bold" th:text="${feedbacks.pages}"></span> 页
+        </p>
+        <!-- 以下用了Bootstrap框架的分页条 -->
+        <div sec:authorize="hasRole('admin')" aria-label="Page navigation" th:align="center">
+            <ul class="pagination pagination">
+                <li>
+                    <a th:href="@{/feedbacks}">
+                        <span aria-hidden="true">首页</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/feedbacks(pageNum = ${feedbacks.hasPreviousPage} ? ${feedbacks.prePage} : 1)}" aria-label="Previous">
+                        <span aria-hidden="true">&lt;</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/feedbacks(pageNum = ${feedbacks.hasNextPage} ? ${feedbacks.nextPage} : ${feedbacks.pages})}" aria-label="Next">
+                        <span aria-hidden="true">&gt;</span>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/feedbacks(pageNum = ${feedbacks.pages})}">
+                        <span aria-hidden="true">尾页</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!--点击删除按钮后弹出的页面-->
+<div class="zhezhao"></div>
+<form method="post" id="deleteForm">
+    <!--与PUT请求类似，DELETE请求也需要显式地指定请求方式-->
+    <input type="hidden" name="_method" value="delete">
+    <div class="remove" id="removeProv">
+       <div class="removerChid">
+           <h2>提示</h2>
+           <div class="removeMain" >
+               <p>确定删除该反馈吗？</p>
+               <a href="#" id="yes">确定</a>
+               <a href="#" id="no">取消</a>
+           </div>
+       </div>
+    </div>
+</form>
+
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<div th:replace="main/public :: #public_js"></div>
+</body>
+</html>

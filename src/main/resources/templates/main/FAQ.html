@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" th:replace="main/public :: #public_left(activeUri='FAQ')">
+    </div>
+    <div class="right" sec:authorize="isAuthenticated()">
+        <div class="providerAdd">
+            <h3>1. 提交订单后，多久才能知道审核结果？</h3>
+            <div class="FAQ">
+                <p>
+                    &nbsp;&nbsp;&nbsp;
+                    成功提交订单后，订单状态默认为 "待审核"，一般情况下，管理员会在 "申请使用的时间段" 的前一周内对订单进行审核和处理，您可以随时在 "我的订单" 中查看 "订单状态" 是否已更新。
+                </p>
+            </div>
+        </div>
+        <div class="providerAdd">
+            <h3>2. 订单状态为 "审核不通过" 是什么原因？</h3>
+            <div class="FAQ">
+                <p>
+                    &nbsp;&nbsp;&nbsp;
+                    订单状态为 "审核不通过"，一般有两种原因：<br/>&nbsp;&nbsp;&nbsp;
+                    (1) 使用人数过少。例如：使用人数不足 8 人。因使用人数过少会造成场地资源浪费，故审核不通过。<br/>&nbsp;&nbsp;&nbsp;
+                    (2) 不可抗力因素。例如：场地在该时间段内需要大范围修整、场地设备需要大规模更换等。建议预约别的时间使用场地。
+                </p>
+            </div>
+        </div>
+        <div class="providerAdd">
+            <h3>3. 订单通过审核后，需要打印使用凭证吗？</h3>
+            <div class="FAQ">
+                <p>
+                    &nbsp;&nbsp;&nbsp;
+                    不需要。<br/>&nbsp;&nbsp;&nbsp;
+                    通过点击 "我的订单" -> "操作" 中的 "获取凭证" 图标，就可以获取 "审核通过" 的邮件凭证，在使用当天向值班工作人员出示申请人证件以及该邮件即可。&nbsp;&nbsp;&nbsp;
+                </p>
+            </div>
+        </div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;以上没有解决您的问题？ <a th:href="@{/feedback.html}">问题反馈</a></div>
+    </div>
+</section>
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<script src="js/time.js"></script>
+</body>
+</html>

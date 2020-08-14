@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" sec:authorize="hasAnyRole('admin','user')" th:replace="main/public :: #public_left">
+    </div>
+    <div class="right">
+        <div class="noticeView">
+            <p align="center">
+                <strong><span th:text="${notice.title}"></span></strong><br>
+                <span id="showtime" th:text="${#dates.format(notice.publishTime, '发布时间：yyyy年MM月dd日 HH:mm')}"></span>
+            </p>
+            <br/>
+            <p>&emsp;&emsp;<span th:text="${notice.content}"></span></p>
+
+            <!-- "查看详情"页面的返回按钮(直接后退回上一步) -->
+            <a onclick="history.back(-1)">返回</a>
+        </div>
+    </div>
+</section>
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<div th:replace="main/public :: #public_js"></div>
+</body>
+</html>

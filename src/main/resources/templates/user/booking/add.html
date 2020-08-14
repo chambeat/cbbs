@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en" th:replace="main/public :: #public_head">
+</head>
+<body>
+<!--头部-->
+<header class="publicHeader" th:replace="main/public :: #public_header">
+</header>
+<!--时间-->
+<section class="publicTime" th:replace="main/public :: #public_time">
+</section>
+<!--主体内容-->
+<section class="publicMain">
+    <div class="left" th:replace="main/public :: #public_left(activeUri='booking')">
+    </div>
+    <div class="right">
+        <div class="location">
+            <strong>你现在所在的位置是:</strong>
+            <span>预订信息填写页面</span>
+        </div>
+        <div class="providerAdd">
+            <form id="addForm" th:action="@{/booking}" th:method="post" autocomplete="off">
+                <!--div的class 为error是验证错误，ok是验证成功-->
+                <span>注意：带*为必填项。</span>
+                <div class="">
+                    <label for="school">二级学院/部门：</label>
+                    <input type="text" name="school" id="school" th:value="${user.school}" readonly/>
+                </div>
+                <div>
+                    <label for="applicant">申请人姓名：</label>
+                    <input type="text" name="applicant" id="applicant" th:value="${user.name}" readonly/>
+
+                </div>
+                <div>
+                    <label for="campusId">学号/工号：</label>
+                    <input type="text" name="campusId" id="campusId" th:value="${user.username}" readonly/>
+                </div>
+                <div>
+                    <label for="phone">手机号码：</label>
+                    <input type="text" name="phone" id="phone" onfocus="$('#phone').select()" placeholder="请输入您的手机号码" minlength="11" maxlength="11" pattern="[0-9]{11}" autofocus required/>
+                    <span>* 请输入11位手机号码</span>
+                </div>
+                <div>
+                    <label for="email">邮箱：</label>
+                    <input type="text" name="email" id="email" onfocus="$('#email').select()" placeholder="请输入您的邮箱" pattern="^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$" required/>
+                    <span>* 该邮箱将用于接收 "审核通过" 凭证</span>
+                </div>
+                <div>
+                    <label for="phone">申请使用的时间：</label>
+                    <!-- 使用日期 【注意：强制规定，为了便于管理场地，若有需要，必须提前一周(7天)预约，且周末不开放。】 -->
+                    <input id="dateSelect" name="useTime" class="Wdate" type="text" placeholder="请选择日期" required
+                           onClick="WdatePicker({
+                               el: this,
+                               minDate: '%y-%M-{%d+7}',
+                               maxDate: '%y-%M-{%d+52}',
+                               disabledDays: [0,6],
+                               dateFmt: 'yyyy年MM月dd日'
+                           })">
+                    <!-- 具体使用时段 -->
+                    <select id="timeSelect" name="useTime" required>
+                        <option value="">-- 请选择时间段 --</option>
+                        <option value="09:30-11:30"> 09:30-11:30 (上午)</option>
+                        <option value="14:30-16:20"> 14:30-16:20 (下午)</option>
+                        <option value="16:30-18:30"> 16:30-18:30 (下午)</option>
+                        <option value="19:30-22:00"> 19:30-22:00 (晚上)</option>
+                    </select>
+                    <span id="timeText">* 请选择使用时间</span>
+                </div>
+                <div>
+                    <table>
+                        <td><label for="reason">申请原因：</label></td>
+                        <td>
+                            <!-- 禁止输入"空格"和"回车"（注意textarea标签不可换行！！否则会有默认空格输入） -->
+                            <textarea id="reason" name="reason" placeholder="限输入60字以内..." maxlength="60" required
+                                      onkeydown="if(event.keyCode==32 || event.keyCode==13){return false;}"></textarea>
+                        </td>
+                        <td><span>* 请在末尾备注使用人数（格式为 “使用人数：35人”）</span></td>
+                    </table>
+                </div>
+                <div class="providerAddBtn">
+                    <input id="bookSubmit" class="addBooking" type="submit" onclick="return timeCheck()" value="提交"/>&nbsp;&nbsp;&nbsp;
+                    <a th:href="@{/main.html}">取消</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+<footer class="footer" th:replace="main/public :: #public_footer">
+</footer>
+
+<div th:replace="main/public :: #public_js"></div>
+<!-- 引入日期时间选择器 -->
+<script th:src="@{/js/My97DatePicker/WdatePicker.js}"></script>
+
+<!-- 核实预约时间是否冲突 -->
+<script type="text/javascript" th:inline="javascript">
+    function timeCheck() {
+        var isCheck = false;
+
+        /* 点击提交按钮 */
+        var useTime = $("#dateSelect").val().trim() + "," + $("#timeSelect").val().trim();
+        //thymeleaf行内表达式
+        var url = [[@{/toBooking/}]] + useTime;
+        //发送异步请求，判断时间是否冲突
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            method: 'GET',
+            async: false, /* 此处必须设置为false，否则无法执行功能 */
+            success: function (data) {
+                isCheck = data;
+                data ? $("#timeText").replaceWith("<span id='timeText' style='color: green'></span>")
+                    : $("#timeText").replaceWith("<span id='timeText' style='color: red'>很抱歉，该时间段已被预订，请选择其他时间！</span>");
+            },
+            error: function () {
+                $("#timeText").html("预订失败！请重新进行预订！");
+                isCheck = false;
+            }
+        });
+
+        /* 根据情况判断是否提交 */
+        return isCheck;
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>提交成功</title>
+
+    <style>
+        p {
+            text-align: center;
+        }
+
+        span {
+            color: #ff1b95;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+
+<body>
+<div align="center">
+    <br><br>
+    <p><img th:src="@{/img/success.png}" align="center">&nbsp;&nbsp;&nbsp;提交成功！<span id="time">3</span> 秒后将自动跳转到"我的订单"...</p>
+    <p>如果浏览器长时间没有响应，请<a th:href="@{/booking}">点我跳转</a></p>
+</div>
+
+<script>
+    /*
+        分析：
+            1.实现显示页面效果
+            2.实现倒计时读秒效果
+                2.1 定义一个方法，获取span标签，修改span标签体的内容，时间--
+                2.2 定义一个定时器，1秒执行一次该方法
+            3.在方法中判断时间如果 <=0 ，则跳转至指定的首页。
+     */
+
+    var sp = document.getElementById("time");
+
+    var t = 3;
+
+    function showTime() {
+        t--;
+        if (t < 2)
+            location.href = "http://localhost:8888/booking";
+        sp.innerHTML = t + "";
+    }
+
+    setInterval(showTime, 1000);
+</script>
+</body>
+</html>

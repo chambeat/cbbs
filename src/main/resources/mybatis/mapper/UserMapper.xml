@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.chm.mapper.UserMapper">
+    <!-- 基础的ResultMap -->
+    <resultMap id="BaseResultMap" type="com.chm.entity.User">
+        <id column="id" property="id"/>
+        <result column="school" property="school"/>
+        <result column="name" property="name"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="enabled" property="enabled"/>
+    </resultMap>
+    <!-- 1.延迟(按需)加载用户的角色roles -->
+    <resultMap id="lazyLoadRoles" type="com.chm.entity.User" extends="BaseResultMap">
+        <collection property="roles" ofType="com.chm.entity.Role"
+                    select="com.chm.mapper.UserMapper.getRolesByUserId" column="id">
+        </collection>
+    </resultMap>
+    <!-- 2.立即加载用户的角色roles -->
+    <resultMap id="eagerLoadRoles" type="com.chm.entity.User" extends="BaseResultMap">
+        <collection property="roles" ofType="com.chm.entity.Role">
+            <!--此处的column是别名，在引用了eagerLoadRoles的地方会使用rid和rname作为别名-->
+            <id column="rid" property="id"/>
+            <result column="rname" property="name"/>
+            <result column="nameZh" property="nameZh"/><!--注意：此字段(nameZh)不需要起别名-->
+        </collection>
+    </resultMap>
+
+    <!-- 根据名称查询用户(用于登录校验) -->
+    <select id="loadUserByUsername" resultMap="lazyLoadRoles">
+        select * from `user` where username = #{username}
+    </select>
+
+    <!-- 根据id查询用户（需要查出其对应的角色） -->
+    <select id="getUserById" resultMap="eagerLoadRoles">
+        select `u`.*, `r`.`id` as `rid`, `r`.`name` as `rname`, `r`.`nameZh`
+        from `user` `u`, role r, user_role ur
+        where (ur.roleId = r.id and ur.userId = u.id) and
+        `u`.id = #{id}
+    </select>
+
+    <!-- 根据用户id查询其对应的角色 -->
+    <select id="getRolesByUserId" resultType="com.chm.entity.Role">
+        select r.* from role r, user_role ur
+        where ur.roleId = r.id and ur.userId = #{id}
+    </select>
+
+    <update id="updateUser">
+        UPDATE `user`
+        SET `school`=#{school}, `name`=#{name}, `password`=#{password}
+        WHERE (`id`=#{id})
+    </update>
+
+    <insert id="saveUser">
+        INSERT IGNORE INTO `user` (`school`, `name`, `username`, `password`)
+        VALUES (#{school}, #{name}, #{username}, #{password})
+    </insert>
+
+    <delete id="deleteUser">
+        delete from `user` where id = #{id}
+    </delete>
+
+    <!-- admin权限：查询所有用户 -->
+    <select id="getUsers" resultMap="lazyLoadRoles">
+        select * from `user`
+        <where>
+            <if test="username != null and username != ''">
+                `username` = #{username}
+            </if>
+        </where>
+    </select>
+
+</mapper>
